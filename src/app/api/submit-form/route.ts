@@ -1,10 +1,23 @@
-// src/app/api/submit-form/route.ts
 import { Pool } from 'pg';
 import { NextResponse } from 'next/server';
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Aqui ele lê a DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Necessário para Neon na Vercel
+  },
 });
+
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
 
 export async function POST(req: Request) {
   try {
@@ -33,7 +46,6 @@ export async function POST(req: Request) {
 
     const client = await pool.connect();
 
-    // Nome da tabela deve ser o que você criou, exemplo: respostas_questionario_quilombola
     const query = `
       INSERT INTO respostas_questionario_quilombola (
         comunidade_natal,
@@ -88,12 +100,29 @@ export async function POST(req: Request) {
 
     await client.query(query, values);
     client.release();
-    return NextResponse.json({ message: 'Dados inseridos com sucesso!' }, { status: 200 });
-  } catch (error) {
-    console.error('Erro ao inserir dados:', error);
+
     return NextResponse.json(
-      { message: 'Erro ao inserir dados', error: (error as Error).message, dbError: error },
-      { status: 500 }
+      { message: 'Dados inseridos com sucesso!' },
+      {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      }
+    );
+  } catch (error) {
+    console.error('❌ Erro ao inserir dados:', error);
+    return NextResponse.json(
+      {
+        message: 'Erro ao inserir dados',
+        error: (error as Error).message,
+      },
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      }
     );
   }
 }
