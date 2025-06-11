@@ -1,3 +1,4 @@
+// pages/index.tsx
 "use client";
 import React, { useState } from "react";
 import Select from "../components/Select";
@@ -6,7 +7,7 @@ import MultiSelect from "../components/MultiSelect";
 import TextInput from "../components/TextInput";
 
 const Home: React.FC = () => {
-  // Estados do formulário
+  // Estados do formulário (mantidos como na última versão)
   const [comunidade, setComunidade] = useState("");
   const [universidade, setUniversidade] = useState("");
   const [curso, setCurso] = useState("");
@@ -18,74 +19,55 @@ const Home: React.FC = () => {
   const [outroEquipamento, setOutroEquipamento] = useState("");
 
   const [avaliacaoTecUni, setAvaliacaoTecUni] = useState("");
-  const [frequenciaAcessoLivro, setFrequenciaAcessoLivro] = useState("");
-  const [frequenciaLeituraTextos, setFrequenciaLeituraTextos] = useState("");
+
+  const [freqAcessoLivroImpresso, setFreqAcessoLivroImpresso] = useState("");
+  const [freqAcessoEbookPdf, setFreqAcessoEbookPdf] = useState("");
+  const [freqAcessoRedeSocial, setFreqAcessoRedeSocial] = useState("");
+  const [freqAcessoArtigoCientifico, setFreqAcessoArtigoCientifico] = useState("");
+  const [freqAcessoCopiaLivro, setFreqAcessoCopiaLivro] = useState("");
+
+  const [freqLeituraTextosLongosImpresso, setFreqLeituraTextosLongosImpresso] = useState("");
+  const [freqLeituraTextosLongosEbookPdf, setFreqLeituraTextosLongosEbookPdf] = useState("");
+  const [freqLeituraTextosLongosArtigoCientifico, setFreqLeituraTextosLongosArtigoCientifico] = useState("");
+  const [freqLeituraTextosLongosCopiaLivro, setFreqLeituraTextosLongosCopiaLivro] = useState("");
 
   const [impactoTecnologia, setImpactoTecnologia] = useState("");
   const [avaliacaoFormacao, setAvaliacaoFormacao] = useState("");
-  const [experienciaAntes, setExperienciaAntes] = useState("");
-  const [experienciaDepois, setExperienciaDepois] = useState("");
+  const [experienciaAntesDepois, setExperienciaAntesDepois] = useState("");
 
-  // Estado para controle da mensagem de sucesso
   const [submitStatus, setSubmitStatus] = useState<null | "success" | "error">(null);
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // New state for API errors
 
-  // Opções dos selects, rádios, múltiplos
-  const universidadeOptions = ["UFBA", "UFRB"];
+  // Opções dos selects, rádios, múltiplos (mantidos como na última versão)
+  const universidadeOptions = ["Universidade Federal do Recôncavo da Bahia", "Universidade Federal da Bahia"];
   const cursosOptions = [
-    "História",
-    "Filosofia",
-    "Direito",
-    "Economia",
-    "Biblioteconomia",
-    "Medicina",
-    "Enfermagem",
-    "Engenharia Civil",
-    "Engenharia Ambiental",
-    "Computação",
-    "Pedagogia",
-    "Letras",
-    "Cinema",
-    "BI de Humanidades",
-    "Museologia",
-    "BI de Artes",
-    "BI de Saúde",
-    "BI de Ciência e Tecnologia",
-    "Outro",
+    "História", "Filosofia", "Direito", "Economia", "Biblioteconomia", "Medicina",
+    "Enfermagem", "Engenharia Civil", "Engenharia Ambiental", "Computação",
+    "Pedagogia", "Letras", "Cinema", "BI de Humanidades", "Museologia",
+    "BI de Artes", "BI de Saúde", "BI de Ciência e Tecnologia", "Outro",
   ];
   const acessoLeituraOptions = [
-    "Biblioteca da comunidade",
-    "Biblioteca da escola",
-    "Biblioteca de uma amiga",
-    "Ponto de leitura da comunidade",
+    "biblioteca da comunidade", "biblioteca da escola", "biblioteca de uma amiga",
+    "ponto de leitura da comunidade",
   ];
   const acessoInternetOptions = [
-    "Muito bom",
-    "Bom",
-    "Regular",
-    "Ruim",
-    "Ótimo",
+    "Muito bom", "Ruim", "Regular", "Bom", "Ótimo",
     "Não se aplica. Na comunidade onde morava não tem acesso à internet",
   ];
   const anosInternetOptions = [
-    "Menos de 2 anos",
-    "De 2 a 5 anos",
-    "De 5 a 8 anos",
-    "Mais de 8 anos",
+    "Menos de 2 anos", "De 2 a 5 anos", "De 5 anos a 8 anos", "Mais de 8 anos",
   ];
   const equipamentosOptions = [
-    "Celular smartphone",
-    "Computador/notebook pessoal",
-    "Tablet",
-    "E-reader (ex: Kindle)",
-    "Computador compartilhado (família)",
-    "Computador compartilhado (biblioteca)",
-    "Não se aplica",
-    "Outro",
+    "Celular smartphone", "Computador/notebook pessoal", "Tablet", "E-reader (ex: Kindle)",
+    "Computador compartilhado (família)", "Computador compartilhado (biblioteca)",
+    "Não se aplica.", "Outro",
   ];
-  const avaliacaoOptions = ["Muito bom", "Bom", "Regular", "Ruim", "Ótimo"];
-  const frequenciaOptions = ["Diariamente", "Semanalmente", "Mensalmente", "Raramente"];
+  const avaliacaoOptions = ["Muito bom", "Ruim", "Regular", "Bom", "Ótimo"];
+  const frequenciaLeituraOptions = ["Nunca", "Raramente", "Ocasionalmente", "Frequentemente", "Muito frequentemente"];
 
   const isFormValid = () => {
+    // Check all required fields (as before)
     if (
       !comunidade.trim() ||
       !universidade ||
@@ -97,12 +79,18 @@ const Home: React.FC = () => {
       equipamentos.length === 0 ||
       (equipamentos.includes("Outro") && !outroEquipamento.trim()) ||
       !avaliacaoTecUni ||
-      !frequenciaAcessoLivro ||
-      !frequenciaLeituraTextos ||
-      !impactoTecnologia.trim() ||
+      !freqAcessoLivroImpresso ||
+      !freqAcessoEbookPdf ||
+      !freqAcessoRedeSocial ||
+      !freqAcessoArtigoCientifico ||
+      !freqAcessoCopiaLivro ||
+      !freqLeituraTextosLongosImpresso ||
+      !freqLeituraTextosLongosEbookPdf ||
+      !freqLeituraTextosLongosArtigoCientifico ||
+      !freqLeituraTextosLongosCopiaLivro ||
+      !impactoTecnologia ||
       !avaliacaoFormacao ||
-      !experienciaAntes.trim() ||
-      !experienciaDepois.trim()
+      !experienciaAntesDepois.trim()
     ) {
       return false;
     }
@@ -110,11 +98,16 @@ const Home: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevents default form submission/page reload
+
+    // Reset messages
+    setValidationMessage(null);
+    setErrorMessage(null);
+    setSubmitStatus(null);
 
     if (!isFormValid()) {
-      alert("Por favor, preencha todos os campos obrigatórios antes de enviar.");
-      return;
+      setValidationMessage("Por favor, preencha todos os campos obrigatórios antes de enviar.");
+      return; // Stop here if form is not valid
     }
 
     const finalEquipamentos = equipamentos.includes("Outro")
@@ -131,12 +124,18 @@ const Home: React.FC = () => {
       anosInternet,
       equipamentos: finalEquipamentos,
       avaliacaoTecUni,
-      frequenciaAcessoLivro,
-      frequenciaLeituraTextos,
+      freqAcessoLivroImpresso,
+      freqAcessoEbookPdf,
+      freqAcessoRedeSocial,
+      freqAcessoArtigoCientifico,
+      freqAcessoCopiaLivro,
+      freqLeituraTextosLongosImpresso,
+      freqLeituraTextosLongosEbookPdf,
+      freqLeituraTextosLongosArtigoCientifico,
+      freqLeituraTextosLongosCopiaLivro,
       impactoTecnologia,
       avaliacaoFormacao,
-      experienciaAntes,
-      experienciaDepois,
+      experienciaAntesDepois,
     };
 
     try {
@@ -148,15 +147,23 @@ const Home: React.FC = () => {
 
       if (response.ok) {
         setSubmitStatus("success");
-        // Aguarda 2 segundos e dá reload da página para limpar tudo
+        // Clear form after success
+        // You might want to reset state variables here instead of reloading for a smoother UX
+        // setComunidade(''); etc.
         setTimeout(() => {
-          window.location.reload();
+          window.location.reload(); // Reloads the page to clear the form
         }, 2000);
       } else {
+        // If response is not OK (e.g., 500 error from backend)
+        const errorData = await response.json(); // Try to parse backend error message
+        setErrorMessage(errorData.message || "Ocorreu um erro desconhecido ao enviar o formulário.");
         setSubmitStatus("error");
+        console.error("Backend error response:", errorData); // Log detailed error
       }
     } catch (error) {
+      // Catch network errors or issues before the backend response
       console.error("Erro ao enviar formulário:", error);
+      setErrorMessage("Erro de conexão. Verifique sua internet ou tente novamente mais tarde.");
       setSubmitStatus("error");
     }
   };
@@ -165,16 +172,13 @@ const Home: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-10 px-4">
       <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-lg p-8">
         <h1 className="text-4xl font-bold text-center text-blue-800 mb-2">
-          📚 Formulário de Pesquisa
+          📚 QUESTIONÁRIO - TECNOLOGIA E PRÁTICAS LEITORAS
         </h1>
-        <p className="text-center text-gray-700 font-semibold">
-          Tecnologias e Práticas Leitoras - Estudantes Quilombolas da UFBA/UFRB
+        <p className="text-center text-gray-700 font-semibold mb-2">
+          Estudantes Quilombolas da UFBA  perguntas
         </p>
-        <p className="text-center text-gray-700 mb-2">
+        <p className="text-center text-gray-700 mb-4">
           Pesquisa para o TCC em Biblioteconomia e Documentação - UFBA
-        </p>
-        <p className="text-center text-black font-bold mb-1">
-          ✊🏿 Resistência Quilombola ✊🏿
         </p>
         <p className="text-sm text-center text-gray-600 mb-4">
           <strong>🧠 PROBLEMA DE PESQUISA E OBJETIVO</strong>
@@ -185,18 +189,23 @@ const Home: React.FC = () => {
           Objetivo geral: Compreender os reflexos das tecnologias de informação e
           comunicação nas práticas leitoras de jovens universitários quilombolas.
         </p>
+        <p className="text-center text-black font-bold mb-4">
+          ✊🏿 Resistência Quilombola ✊🏿
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-6 text-black">
+          <h2 className="text-2xl font-bold text-blue-700">PERFIL DO UNIVERSITÁRIO QUILOMBOLA</h2>
           <TextInput
-            label="1. Qual o nome da comunidade quilombola/Estado onde você nasceu?"
+            label="1. Qual o nome da comunidade quilombola/Estado você nasceu?"
             value={comunidade}
             onChange={setComunidade}
           />
-          <Select
+          <Radio
             label="2. Qual universidade você está cursando?"
             options={universidadeOptions}
             value={universidade}
             onChange={setUniversidade}
+            name="universidade"
           />
           <Select
             label="3. Qual o curso que está matriculado?"
@@ -212,25 +221,31 @@ const Home: React.FC = () => {
             />
           )}
           <MultiSelect
-            label="4. Como você acessava o livro e a leitura na comunidade onde nasceu?"
+            label="4. Como você acessava o livro e a leitura na comunidade quilombola que você nasceu?"
             options={acessoLeituraOptions}
             value={acessoLeitura}
             onChange={setAcessoLeitura}
           />
+
+          <hr/>
+
+          <h2 className="text-2xl font-bold text-blue-700">TECNOLOGIA DE INFORMAÇÃO E COMUNICAÇÃO</h2>
           <Radio
             label="5. Como é o acesso à internet na comunidade onde você morava?"
             options={acessoInternetOptions}
             value={acessoInternet}
             onChange={setAcessoInternet}
+            name="acessoInternet"
           />
-          <Select
-            label="6. Há quantos anos a comunidade dispõe de internet?"
+          <Radio
+            label="6. Há quantos anos a comunidade onde você morava dispõe de internet?"
             options={anosInternetOptions}
             value={anosInternet}
             onChange={setAnosInternet}
+            name="anosInternet"
           />
           <MultiSelect
-            label="7. Quais equipamentos você utilizava para acessar leitura antes da universidade?"
+            label="7. Na comunidade onde você morava, marque o(s) equipamento(s) que você utilizava para acessar o livro e a leitura antes de ingressar na universidade. (marque todos que se aplicam)"
             options={equipamentosOptions}
             value={equipamentos}
             onChange={setEquipamentos}
@@ -242,52 +257,117 @@ const Home: React.FC = () => {
               onChange={setOutroEquipamento}
             />
           )}
-
           <Radio
-            label="1. Como você avalia a tecnologia na sua universidade?"
+            label="8. Como você avalia a disponibilização de recursos tecnológicos para acesso ao livro e a leitura na universidade onde estuda?"
             options={avaliacaoOptions}
             value={avaliacaoTecUni}
             onChange={setAvaliacaoTecUni}
+            name="avaliacaoTecUni"
+          />
+
+          <hr/>
+
+          <h2 className="text-2xl font-bold text-blue-700">PRÁTICAS LEITORAS</h2>
+
+          <p className="block text-gray-700 text-sm font-bold mb-2">
+            9. Depois que ingressou na universidade, qual a frequência que você tem acesso ao livro e a leitura?
+          </p>
+          <Radio
+            label="Livro impresso (Acesso)"
+            options={frequenciaLeituraOptions}
+            value={freqAcessoLivroImpresso}
+            onChange={setFreqAcessoLivroImpresso}
+            name="freqAcessoLivroImpresso"
+          />
+          <Radio
+            label="E-book/PDF (Acesso)"
+            options={frequenciaLeituraOptions}
+            value={freqAcessoEbookPdf}
+            onChange={setFreqAcessoEbookPdf}
+            name="freqAcessoEbookPdf"
+          />
+          <Radio
+            label="Rede Social (Twitter, Instagram, Blog) (Acesso)"
+            options={frequenciaLeituraOptions}
+            value={freqAcessoRedeSocial}
+            onChange={setFreqAcessoRedeSocial}
+            name="freqAcessoRedeSocial"
+          />
+          <Radio
+            label="Artigo científico online (Acesso)"
+            options={frequenciaLeituraOptions}
+            value={freqAcessoArtigoCientifico}
+            onChange={setFreqAcessoArtigoCientifico}
+            name="freqAcessoArtigoCientifico"
+          />
+          <Radio
+            label="Cópia de livro, capítulo de livro, apostila (Acesso)"
+            options={frequenciaLeituraOptions}
+            value={freqAcessoCopiaLivro}
+            onChange={setFreqAcessoCopiaLivro}
+            name="freqAcessoCopiaLivro"
+          />
+
+          <p className="block text-gray-700 text-sm font-bold mb-2 mt-6">
+            10. Com que frequência você realiza leitura de textos longos (+20 páginas)?
+          </p>
+          <Radio
+            label="Livro impresso (Textos Longos)"
+            options={frequenciaLeituraOptions}
+            value={freqLeituraTextosLongosImpresso}
+            onChange={setFreqLeituraTextosLongosImpresso}
+            name="freqLeituraTextosLongosImpresso"
+          />
+          <Radio
+            label="E-book/PDF (Textos Longos)"
+            options={frequenciaLeituraOptions}
+            value={freqLeituraTextosLongosEbookPdf}
+            onChange={setFreqLeituraTextosLongosEbookPdf}
+            name="freqLeituraTextosLongosEbookPdf"
+          />
+          <Radio
+            label="Artigo científico online (Textos Longos)"
+            options={frequenciaLeituraOptions}
+            value={freqLeituraTextosLongosArtigoCientifico}
+            onChange={setFreqLeituraTextosLongosArtigoCientifico}
+            name="freqLeituraTextosLongosArtigoCientifico"
+          />
+          <Radio
+            label="Cópia de livro, capítulo de livro, apostila (Textos Longos)"
+            options={frequenciaLeituraOptions}
+            value={freqLeituraTextosLongosCopiaLivro}
+            onChange={setFreqLeituraTextosLongosCopiaLivro}
+            name="freqLeituraTextosLongosCopiaLivro"
           />
 
           <Radio
-            label="14. Com que frequência você acessa livros da biblioteca?"
-            options={frequenciaOptions}
-            value={frequenciaAcessoLivro}
-            onChange={setFrequenciaAcessoLivro}
-          />
-
-          <Radio
-            label="15. Com que frequência você lê textos acadêmicos?"
-            options={frequenciaOptions}
-            value={frequenciaLeituraTextos}
-            onChange={setFrequenciaLeituraTextos}
-          />
-
-          <TextInput
-            label="2. Qual o impacto da tecnologia nas suas práticas de leitura?"
+            label="11. Como você avalia o impacto da tecnologia de informação e comunicação no acesso ao livro e a leitura?"
+            options={avaliacaoOptions}
             value={impactoTecnologia}
             onChange={setImpactoTecnologia}
+            name="impactoTecnologia"
           />
 
           <Radio
-            label="3. Como você avalia a formação que recebeu para uso das tecnologias?"
+            label="12. Como você avalia o acesso ao livro e a leitura que auxiliam sua formação acadêmica, a partir da tecnologia de informação e comunicação?"
             options={avaliacaoOptions}
             value={avaliacaoFormacao}
             onChange={setAvaliacaoFormacao}
+            name="avaliacaoFormacao"
           />
 
           <TextInput
-            label="4. Conte sobre sua experiência com leitura antes da universidade"
-            value={experienciaAntes}
-            onChange={setExperienciaAntes}
+            label="13. Compartilhe brevemente duas experiências sobre tecnologia de informação e comunicação e o acesso ao livro e a leitura, uma antes e outra depois de seu ingresso na universidade."
+            value={experienciaAntesDepois}
+            onChange={setExperienciaAntesDepois}
           />
 
-          <TextInput
-            label="5. Conte sobre sua experiência com leitura depois de entrar na universidade"
-            value={experienciaDepois}
-            onChange={setExperienciaDepois}
-          />
+
+          {validationMessage && (
+            <p className="text-red-600 text-center mt-2 font-semibold">
+              {validationMessage}
+            </p>
+          )}
 
           {submitStatus === "success" ? (
             <p className="text-green-600 font-semibold text-center">
@@ -302,16 +382,21 @@ const Home: React.FC = () => {
             </button>
           )}
 
-          {submitStatus === "error" && (
+          {errorMessage && ( // Display a specific error message from the API
             <p className="text-red-600 text-center mt-2">
-              Ocorreu um erro ao enviar o formulário. Tente novamente.
+              **Erro:** {errorMessage}
             </p>
           )}
         </form>
+
+        <footer>
+          <p className="text-center text-gray-600 mt-6">
+            Desenvolvido por <a href="">Vanderlei Neto</a> - 2025
+          </p>
+        </footer>
       </div>
     </div>
   );
 };
 
 export default Home;
-

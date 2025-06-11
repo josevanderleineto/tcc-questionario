@@ -1,4 +1,3 @@
-// components/MultiSelect.tsx
 import React from 'react';
 
 interface MultiSelectProps {

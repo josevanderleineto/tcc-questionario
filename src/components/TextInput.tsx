@@ -1,4 +1,3 @@
-// components/TextInput.tsx
 import React from 'react';
 
 interface TextInputProps {
@@ -25,5 +24,3 @@ const TextInput: React.FC<TextInputProps> = ({ label, value, onChange }) => {
 };
 
 export default TextInput;
-
-
