@@ -3,7 +3,7 @@ import React from 'react';
 interface MultiSelectProps {
   label: string;
   options: string[];
-  value: string[]; // array de strings
+  value: string[];
   onChange: (selected: string[]) => void;
 }
 

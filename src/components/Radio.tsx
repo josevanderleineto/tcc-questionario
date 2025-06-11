@@ -5,7 +5,7 @@ interface RadioProps {
   options: string[];
   value: string;
   onChange: (value: string) => void;
-  name: string; // Add name prop for unique grouping
+  name: string;
 }
 
 const Radio: React.FC<RadioProps> = ({ label, options, value, onChange, name }) => {
@@ -16,7 +16,7 @@ const Radio: React.FC<RadioProps> = ({ label, options, value, onChange, name }) 
         <label key={option} className="inline-flex items-center mr-4 mb-2 cursor-pointer">
           <input
             type="radio"
-            name={name} // Use the unique name prop here
+            name={name}
             className="form-radio"
             value={option}
             checked={value === option}

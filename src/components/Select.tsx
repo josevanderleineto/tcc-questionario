@@ -4,7 +4,7 @@ interface SelectProps {
   label: string;
   options: string[];
   value: string;
-  onChange: (value: string) => void; // recebe valor direto
+  onChange: (value: string) => void;
 }
 
 const Select: React.FC<SelectProps> = ({ label, options, value, onChange }) => {
@@ -17,7 +17,7 @@ const Select: React.FC<SelectProps> = ({ label, options, value, onChange }) => {
         id={label}
         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         value={value}
-        onChange={(e) => onChange(e.target.value)} // adapta evento para valor
+        onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Selecione</option>
         {options.map((option) => (
