@@ -1,0 +1,32 @@
+// components/Radio.tsx
+import React from 'react';
+
+interface RadioProps {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const Radio: React.FC<RadioProps> = ({ label, options, value, onChange }) => {
+  return (
+    <div className="mb-4">
+      <p className="block text-gray-700 text-sm font-bold mb-2">{label}</p>
+      {options.map((option) => (
+        <label key={option} className="inline-flex items-center mr-4 mb-2 cursor-pointer">
+          <input
+            type="radio"
+            name={label}
+            className="form-radio"
+            value={option}
+            checked={value === option}
+            onChange={() => onChange(option)}
+          />
+          <span className="ml-2">{option}</span>
+        </label>
+      ))}
+    </div>
+  );
+};
+
+export default Radio;
