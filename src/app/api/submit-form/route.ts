@@ -1,30 +1,31 @@
 import { Pool } from 'pg';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Neon exige isso em alguns casos
+  },
 });
 
-// Função para configurar CORS dinamicamente
-function getCorsHeaders(origin: string) {
-  const allowedOrigins = [
-    'https://tcc-questionario.vercel.app',
-    'https://www.pesquisatecnologiaepraticasleitoras.xyz',
-  ];
-
-  const isAllowed = allowedOrigins.includes(origin);
-
+// Liberar CORS totalmente
+function getCorsHeaders() {
   return {
-    'Access-Control-Allow-Origin': isAllowed ? origin : '',
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 }
 
-// Lidando com o envio do formulário
-export async function POST(req: Request) {
-  const origin = req.headers.get('origin') || '';
+// Tratar requisição OPTIONS (preflight CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: getCorsHeaders(),
+  });
+}
 
+export async function POST(req: NextRequest) {
   try {
     const {
       comunidade,
@@ -106,24 +107,31 @@ export async function POST(req: Request) {
     await client.query(query, values);
     client.release();
 
-    return NextResponse.json(
-      { message: 'Dados inseridos com sucesso!' },
-      { status: 200, headers: getCorsHeaders(origin) }
+    return new NextResponse(
+      JSON.stringify({ message: 'Dados inseridos com sucesso!' }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...getCorsHeaders(),
+        },
+      }
     );
   } catch (error) {
     console.error('Erro ao inserir dados:', error);
-    return NextResponse.json(
-      { message: 'Erro ao inserir dados', error: (error as Error).message },
-      { status: 500, headers: getCorsHeaders(origin) }
+
+    return new NextResponse(
+      JSON.stringify({
+        message: 'Erro ao inserir dados',
+        error: (error as Error).message,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          ...getCorsHeaders(),
+        },
+      }
     );
   }
-}
-
-// Tratamento da requisição OPTIONS (pré-flight)
-export async function OPTIONS(req: Request) {
-  const origin = req.headers.get('origin') || '';
-  return new Response(null, {
-    status: 204,
-    headers: getCorsHeaders(origin),
-  });
 }
