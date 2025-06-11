@@ -1,25 +1,39 @@
 import { Pool } from 'pg';
 import { NextResponse } from 'next/server';
 
+// Conexão com o banco
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // Necessário para Neon na Vercel
-  },
 });
 
-export async function OPTIONS() {
+// Domínios autorizados
+const allowedOrigins = [
+  'https://tcc-questionario.vercel.app',
+  'https://www.pesquisatecnologiaepraticasleitoras.xyz',
+];
+
+// Função para gerar headers CORS
+function getCorsHeaders(origin: string) {
+  const isAllowed = allowedOrigins.includes(origin);
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : '',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+}
+
+// Handler para requisições OPTIONS (pré-flight do CORS)
+export async function OPTIONS(req: Request) {
+  const origin = req.headers.get('origin') || '';
   return NextResponse.json({}, {
     status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
+    headers: getCorsHeaders(origin),
   });
 }
 
+// Handler para requisições POST
 export async function POST(req: Request) {
+  const origin = req.headers.get('origin') || '';
   try {
     const {
       comunidade,
@@ -103,26 +117,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { message: 'Dados inseridos com sucesso!' },
-      {
-        status: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
+      { status: 200, headers: getCorsHeaders(origin) }
     );
   } catch (error) {
     console.error('❌ Erro ao inserir dados:', error);
     return NextResponse.json(
-      {
-        message: 'Erro ao inserir dados',
-        error: (error as Error).message,
-      },
-      {
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
+      { message: 'Erro ao inserir dados', error: (error as Error).message },
+      { status: 500, headers: getCorsHeaders(origin) }
     );
   }
 }
