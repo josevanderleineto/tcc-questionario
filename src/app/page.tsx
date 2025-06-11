@@ -393,6 +393,7 @@ const Home: React.FC = () => {
           <p className="text-center text-gray-600 mt-6">
             Desenvolvido por <a href="">Vanderlei Neto</a> - 2025
           </p>
+          <p className="text-center text-gray-600">Orientado pela professora doutora Kátia Rodrigues.</p>
         </footer>
       </div>
     </div>
