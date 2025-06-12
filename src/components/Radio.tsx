@@ -10,21 +10,23 @@ interface RadioProps {
 
 const Radio: React.FC<RadioProps> = ({ label, options, value, onChange, name }) => {
   return (
-    <div className="mb-4">
+    <div>
       <p className="block text-gray-700 text-sm font-bold mb-2">{label}</p>
-      {options.map((option) => (
-        <label key={option} className="inline-flex items-center mr-4 mb-2 cursor-pointer">
-          <input
-            type="radio"
-            name={name}
-            className="form-radio"
-            value={option}
-            checked={value === option}
-            onChange={() => onChange(option)}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
+      <div className="space-y-2">
+        {options.map((option) => (
+          <label key={option} className="flex items-center cursor-pointer">
+            <input
+              type="radio"
+              name={name}
+              className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              value={option}
+              checked={value === option}
+              onChange={() => onChange(option)}
+            />
+            <span className="ml-3 text-sm text-gray-700">{option}</span>
+          </label>
+        ))}
+      </div>
     </div>
   );
 };

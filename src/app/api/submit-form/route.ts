@@ -4,24 +4,18 @@ import { NextRequest, NextResponse } from 'next/server';
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // Neon exige isso em alguns casos
+    rejectUnauthorized: false,
   },
 });
 
-// Liberar CORS totalmente
-function getCorsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
-}
-
-// Tratar requisição OPTIONS (preflight CORS)
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
-    headers: getCorsHeaders(),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
   });
 }
 
@@ -36,22 +30,17 @@ export async function POST(req: NextRequest) {
       anosInternet,
       equipamentos,
       avaliacaoTecUni,
-      freqAcessoLivroImpresso,
-      freqAcessoEbookPdf,
-      freqAcessoRedeSocial,
-      freqAcessoArtigoCientifico,
-      freqAcessoCopiaLivro,
-      freqLeituraTextosLongosImpresso,
-      freqLeituraTextosLongosEbookPdf,
-      freqLeituraTextosLongosArtigoCientifico,
-      freqLeituraTextosLongosCopiaLivro,
-      impactoTecnologia,
+      freqAcessoGeral, // Campo simplificado
+      freqLeituraTextosLongos,
+      justificativaLeituraLonga,
+      impactoTecnologiaComunidade,
       avaliacaoFormacao,
       experienciaAntesDepois,
     } = await req.json();
 
     const client = await pool.connect();
-
+    
+    // Query alinhada com a nova estrutura da tabela
     const query = `
       INSERT INTO respostas_questionario_quilombola (
         comunidade_natal,
@@ -62,22 +51,16 @@ export async function POST(req: NextRequest) {
         anos_internet_comunidade,
         equipamentos_utilizados,
         avaliacao_tecnologia_universidade,
-        frequencia_acesso_livro_impresso,
-        frequencia_acesso_ebook_pdf,
-        frequencia_acesso_rede_social,
-        frequencia_acesso_artigo_cientifico,
-        frequencia_acesso_copia_livro,
-        frequencia_leitura_textos_longos_impresso,
-        frequencia_leitura_textos_longos_ebook_pdf,
-        frequencia_leitura_textos_longos_artigo_cientifico,
-        frequencia_leitura_textos_longos_copia_livro,
-        avaliacao_impacto_tecnologia,
+        frequencia_acesso_geral, -- Coluna simplificada
+        frequencia_leitura_textos_longos,
+        justificativa_leitura_longa,
+        avaliacao_impacto_tecnologia_comunidade,
         avaliacao_formacao_tecnologia,
         experiencia_antes_depois,
         data_envio
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW()
+        $11, $12, $13, $14, NOW()
       );
     `;
 
@@ -85,21 +68,15 @@ export async function POST(req: NextRequest) {
       comunidade,
       universidade,
       curso,
-      acessoLeitura.join(', '),
+      Array.isArray(acessoLeitura) ? acessoLeitura.join(', ') : '',
       acessoInternet,
       anosInternet,
-      equipamentos.join(', '),
+      Array.isArray(equipamentos) ? equipamentos.join(', ') : '',
       avaliacaoTecUni,
-      freqAcessoLivroImpresso,
-      freqAcessoEbookPdf,
-      freqAcessoRedeSocial,
-      freqAcessoArtigoCientifico,
-      freqAcessoCopiaLivro,
-      freqLeituraTextosLongosImpresso,
-      freqLeituraTextosLongosEbookPdf,
-      freqLeituraTextosLongosArtigoCientifico,
-      freqLeituraTextosLongosCopiaLivro,
-      impactoTecnologia,
+      freqAcessoGeral, // Valor simplificado
+      freqLeituraTextosLongos,
+      justificativaLeituraLonga,
+      impactoTecnologiaComunidade,
       avaliacaoFormacao,
       experienciaAntesDepois,
     ];
@@ -107,31 +84,14 @@ export async function POST(req: NextRequest) {
     await client.query(query, values);
     client.release();
 
-    return new NextResponse(
-      JSON.stringify({ message: 'Dados inseridos com sucesso!' }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          ...getCorsHeaders(),
-        },
-      }
-    );
+    return NextResponse.json({ message: 'Dados inseridos com sucesso!' }, { status: 200 });
+
   } catch (error) {
     console.error('Erro ao inserir dados:', error);
-
-    return new NextResponse(
-      JSON.stringify({
-        message: 'Erro ao inserir dados',
-        error: (error as Error).message,
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          ...getCorsHeaders(),
-        },
-      }
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return NextResponse.json(
+      { message: 'Erro ao inserir dados no servidor', error: errorMessage },
+      { status: 500 }
     );
   }
 }

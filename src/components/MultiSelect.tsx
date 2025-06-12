@@ -17,19 +17,21 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ label, options, value, onChan
   };
 
   return (
-    <div className="mb-4">
+    <div>
       <p className="block text-gray-700 text-sm font-bold mb-2">{label}</p>
-      {options.map((option) => (
-        <label key={option} className="inline-flex items-center mr-4 mb-2 cursor-pointer">
-          <input
-            type="checkbox"
-            className="form-checkbox"
-            checked={value.includes(option)}
-            onChange={() => toggleOption(option)}
-          />
-          <span className="ml-2">{option}</span>
-        </label>
-      ))}
+       <div className="space-y-2">
+        {options.map((option) => (
+          <label key={option} className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              checked={value.includes(option)}
+              onChange={() => toggleOption(option)}
+            />
+            <span className="ml-3 text-sm text-gray-700">{option}</span>
+          </label>
+        ))}
+      </div>
     </div>
   );
 };
