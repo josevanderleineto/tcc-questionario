@@ -220,9 +220,9 @@ const Home: React.FC = () => {
 
         <footer className="mt-12 text-center text-sm text-gray-500">
           <p>
-            Desenvolvido por <a href="https://www.linkedin.com/in/vanderlei-nascimento-neto-342462ba/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Vanderlei Neto</a> - 2025
+            Desenvolvido por <a href="http://lattes.cnpq.br/2822898709875528" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Vanderlei Neto</a> - 2025
           </p>
-          <p>Orientado pela professora doutora Kátia Rodrigues.</p>
+          <p>Orientado pela professora doutora <a href=" http://lattes.cnpq.br/2274233937243548" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Kátia Rodrigues</a></p>
         </footer>
       </div>
     </div>
