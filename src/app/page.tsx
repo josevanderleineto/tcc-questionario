@@ -195,8 +195,8 @@ const Home: React.FC = () => {
             <div className="space-y-6">
               <Radio label="9. Depois que ingressou na universidade, qual a frequência que você tem acesso ao livro e a leitura?" options={frequenciaLeituraOptions} value={freqAcessoGeral} onChange={setFreqAcessoGeral} name="freqAcessoGeral" />
               <Radio label="10. Com que frequência você realiza leitura de textos longos (+20 páginas)?" options={frequenciaLeituraOptions} value={freqLeituraTextosLongos} onChange={setFreqLeituraTextosLongos} name="freqLeituraTextosLongos" />
-              <TextInput label="11. Justifique brevemente a resposta da pergunta anterior." value={justificativaLeituraLonga} onChange={setJustificativaLeituraLonga} />
-              <Radio label="12. Como você avalia o impacto da tecnologia de informação e comunicação no acesso ao livro e a leitura na comunidade onde você morava?" options={avaliacaoOptions} value={impactoTecnologiaComunidade} onChange={setImpactoTecnologiaComunidade} name="impactoTecnologiaComunidade" />
+              <Radio label="11. Como você avalia o impacto da tecnologia de informação e comunicação no acesso ao livro e a leitura na comunidade onde você morava?" options={avaliacaoOptions} value={impactoTecnologiaComunidade} onChange={setImpactoTecnologiaComunidade} name="impactoTecnologiaComunidade" />
+              <TextInput label="12. Justifique brevemente a resposta da pergunta anterior." value={justificativaLeituraLonga} onChange={setJustificativaLeituraLonga} />
               <Radio label="13. Como você avalia o acesso ao livro e a leitura que auxiliam sua formação acadêmica, a partir da tecnologia de informação e comunicação?" options={avaliacaoOptions} value={avaliacaoFormacao} onChange={setAvaliacaoFormacao} name="avaliacaoFormacao" />
               <TextInput label="14. Compartilhe brevemente duas experiências sobre tecnologia de informação e comunicação e o acesso ao livro e a leitura, uma antes e outra depois de seu ingresso na universidade." value={experienciaAntesDepois} onChange={setExperienciaAntesDepois} />
             </div>
