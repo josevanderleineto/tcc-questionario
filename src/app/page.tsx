@@ -33,7 +33,7 @@ const Home: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // --- Opções dos Campos ---
-  const universidadeOptions = ["Universidade Federal do Recôncavo da Bahia", "Universidade Federal da Bahia"];
+  const universidadeOptions = ["Universidade Federal do Recôncavo da Bahia", "Universidade Federal da Bahia", "UFSB	Universidade Federal do Sul da Bahia", "UFSB Universidade Federal do Oeste da Bahia", "UFOB	Universidade Federal do Oeste da Bahia", "UNIVASF	Universidade Federal do Vale do São Francisco", "UNILAB	Universidade da Integração Internacional da Lusofonia Afro-Brasileira"];
   const cursosOptions = [
     "História", "Filosofia", "Direito", "Economia", "Biblioteconomia", "Medicina",
     "Enfermagem", "Engenharia Civil", "Engenharia Ambiental", "Computação",
