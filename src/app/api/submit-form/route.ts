@@ -1,25 +1,12 @@
+// src/app/api/submit-form/route.ts
 import { Pool } from 'pg';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
 });
 
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
-}
-
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const {
       comunidade,
@@ -30,17 +17,17 @@ export async function POST(req: NextRequest) {
       anosInternet,
       equipamentos,
       avaliacaoTecUni,
-      freqAcessoGeral, // Campo simplificado
+      freqAcessoGeral,
       freqLeituraTextosLongos,
       justificativaLeituraLonga,
       impactoTecnologiaComunidade,
       avaliacaoFormacao,
       experienciaAntesDepois,
+      email,
     } = await req.json();
 
     const client = await pool.connect();
-    
-    // Query alinhada com a nova estrutura da tabela
+
     const query = `
       INSERT INTO respostas_questionario_quilombola (
         comunidade_natal,
@@ -51,16 +38,16 @@ export async function POST(req: NextRequest) {
         anos_internet_comunidade,
         equipamentos_utilizados,
         avaliacao_tecnologia_universidade,
-        frequencia_acesso_geral, -- Coluna simplificada
+        frequencia_acesso_geral,
         frequencia_leitura_textos_longos,
         justificativa_leitura_longa,
-        avaliacao_impacto_tecnologia_comunidade,
+        impacto_tecnologia_comunidade,
         avaliacao_formacao_tecnologia,
         experiencia_antes_depois,
-        data_envio
+        email -- AQUI! REMOVEMOS 'data_envio' da lista de colunas
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, NOW()
+        $11, $12, $13, $14, $15 -- AQUI! Agora são 15 placeholders, correspondendo aos 15 valores na lista 'values'
       );
     `;
 
@@ -68,29 +55,33 @@ export async function POST(req: NextRequest) {
       comunidade,
       universidade,
       curso,
-      Array.isArray(acessoLeitura) ? acessoLeitura.join(', ') : '',
+      acessoLeitura.join(', '),
       acessoInternet,
       anosInternet,
-      Array.isArray(equipamentos) ? equipamentos.join(', ') : '',
+      equipamentos.join(', '),
       avaliacaoTecUni,
-      freqAcessoGeral, // Valor simplificado
+      freqAcessoGeral,
       freqLeituraTextosLongos,
       justificativaLeituraLonga,
       impactoTecnologiaComunidade,
       avaliacaoFormacao,
       experienciaAntesDepois,
+      email,
     ];
 
     await client.query(query, values);
     client.release();
-
     return NextResponse.json({ message: 'Dados inseridos com sucesso!' }, { status: 200 });
-
   } catch (error) {
     console.error('Erro ao inserir dados:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    if ((error as any).code === '23505') { // PostgreSQL code for unique_violation
+        return NextResponse.json(
+            { message: 'Erro: Este e-mail já foi utilizado para enviar uma resposta. Por favor, utilize outro e-mail.', error: (error as Error).message },
+            { status: 409 }
+        );
+    }
     return NextResponse.json(
-      { message: 'Erro ao inserir dados no servidor', error: errorMessage },
+      { message: 'Erro ao inserir dados', error: (error as Error).message, dbError: error },
       { status: 500 }
     );
   }
