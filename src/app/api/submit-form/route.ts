@@ -75,16 +75,27 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Erro ao inserir dados:', error);
 
-    // SOLUÇÃO: Verificação de tipo mais segura para o erro
+    // Helper para obter a mensagem de erro de forma segura
+    let errorMessage = 'Erro desconhecido';
+    if (error instanceof Error) { // Verifica se é uma instância de Error
+        errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null && 'message' in error) {
+        errorMessage = (error as { message: string }).message; // Se for um objeto com 'message'
+    } else if (typeof error === 'string') {
+        errorMessage = error; // Se for uma string
+    }
+
+    // A primeira verificação para o código de erro do PostgreSQL já está boa
     if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') {
         return NextResponse.json(
-            { message: 'Erro: Este e-mail já foi utilizado para enviar uma resposta. Por favor, utilize outro e-mail.', error: (error as Error).message },
+            { message: 'Erro: Este e-mail já foi utilizado para enviar uma resposta. Por favor, utilize outro e-mail.', error: errorMessage },
             { status: 409 }
         );
     }
-    // Trata outros erros
+    
+    // Agora usando 'errorMessage' que foi tratado
     return NextResponse.json(
-      { message: 'Erro ao inserir dados', error: (error as Error).message || 'Erro desconhecido', dbError: error },
+      { message: 'Erro ao inserir dados', error: errorMessage, dbError: error },
       { status: 500 }
     );
   }
