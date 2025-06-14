@@ -1,3 +1,4 @@
+// pages/index.tsx
 "use client";
 import React, { useState } from "react";
 import Select from "../components/Select";
@@ -19,7 +20,6 @@ const Home: React.FC = () => {
   const [outroEquipamento, setOutroEquipamento] = useState("");
   const [avaliacaoTecUni, setAvaliacaoTecUni] = useState("");
 
-  // Estado simplificado para a Pergunta 9
   const [freqAcessoGeral, setFreqAcessoGeral] = useState("");
 
   const [freqLeituraTextosLongos, setFreqLeituraTextosLongos] = useState("");
@@ -28,12 +28,14 @@ const Home: React.FC = () => {
   const [avaliacaoFormacao, setAvaliacaoFormacao] = useState("");
   const [experienciaAntesDepois, setExperienciaAntesDepois] = useState("");
 
+  const [email, setEmail] = useState(""); // Estado para 'email'
+
   const [submitStatus, setSubmitStatus] = useState<null | "success" | "error" | "loading">(null);
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // --- Opções dos Campos ---
-  const universidadeOptions = ["Universidade Federal do Recôncavo da Bahia", "Universidade Federal da Bahia", "UFSB	Universidade Federal do Sul da Bahia", "UFSB Universidade Federal do Oeste da Bahia", "UFOB	Universidade Federal do Oeste da Bahia", "UNIVASF	Universidade Federal do Vale do São Francisco", "UNILAB	Universidade da Integração Internacional da Lusofonia Afro-Brasileira"];
+  // --- Opções dos Campos (mantidas) ---
+  const universidadeOptions = ["Universidade Federal do Recôncavo da Bahia", "Universidade Federal da Bahia"];
   const cursosOptions = [
     "História", "Filosofia", "Direito", "Economia", "Biblioteconomia", "Medicina",
     "Enfermagem", "Engenharia Civil", "Engenharia Ambiental", "Computação",
@@ -60,7 +62,7 @@ const Home: React.FC = () => {
   const frequenciaLeituraOptions = ["Nunca", "Raramente", "Ocasionalmente", "Frequentemente", "Muito frequentemente"];
 
   const isFormValid = () => {
-    // Validação correta com o campo simplificado da pergunta 9
+    // ATUALIZADO: Adicionando validação para o campo 'email'
     if (
       !comunidade.trim() || !universidade || !curso ||
       (curso === "Outro" && !outroCurso.trim()) ||
@@ -69,10 +71,11 @@ const Home: React.FC = () => {
       !acessoInternet || !anosInternet || equipamentos.length === 0 ||
       (equipamentos.includes("Outro") && !outroEquipamento.trim()) ||
       !avaliacaoTecUni ||
-      !freqAcessoGeral || // Validação correta
+      !freqAcessoGeral ||
       !freqLeituraTextosLongos ||
       !justificativaLeituraLonga.trim() ||
-      !impactoTecnologiaComunidade || !avaliacaoFormacao || !experienciaAntesDepois.trim()
+      !impactoTecnologiaComunidade || !avaliacaoFormacao || !experienciaAntesDepois.trim() ||
+      !email.trim() // NOVO: Validação obrigatória do email
     ) {
       return false;
     }
@@ -115,6 +118,7 @@ const Home: React.FC = () => {
       impactoTecnologiaComunidade,
       avaliacaoFormacao,
       experienciaAntesDepois,
+      email,
     };
 
     try {
@@ -129,11 +133,14 @@ const Home: React.FC = () => {
         setTimeout(() => window.location.reload(), 3000);
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.message || "Ocorreu um erro desconhecido ao enviar o formulário.");
+        if (response.status === 409 && errorData.error && errorData.error.includes("duplicate key value violates unique constraint")) {
+            setErrorMessage("Erro: Este e-mail já foi utilizado para enviar uma resposta. Por favor, utilize outro e-mail.");
+        } else {
+            setErrorMessage(errorData.message || "Ocorreu um erro desconhecido ao enviar o formulário.");
+        }
         setSubmitStatus("error");
       }
     } catch (error) {
-      // CORREÇÃO: Usando a variável 'error' para o log, resolvendo o erro do ESLint.
       console.error("Falha ao conectar com a API:", error);
       setErrorMessage("Erro de conexão. Verifique sua internet ou tente novamente mais tarde.");
       setSubmitStatus("error");
@@ -201,15 +208,27 @@ const Home: React.FC = () => {
               <TextInput label="14. Compartilhe brevemente duas experiências sobre tecnologia de informação e comunicação e o acesso ao livro e a leitura, uma antes e outra depois de seu ingresso na universidade." value={experienciaAntesDepois} onChange={setExperienciaAntesDepois} />
             </div>
           </div>
-          
+
+          {/* Campo de Email - Agora obrigatório */}
+          <div className="mt-8 pt-6 border-t border-blue-200">
+             <h2 className="text-2xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 mb-4">E-mail</h2>
+             <TextInput
+               label="15. Por favor, digite seu e-mail para contato." // Label indicando que é obrigatório
+               value={email}
+               onChange={setEmail}
+               type="email"
+               required // Atributo HTML 'required' para validação básica do navegador
+             />
+          </div>
+
           {/* --- Mensagens e Botão de Envio --- */}
           <div className="mt-8 pt-6 border-t">
             {validationMessage && <p className="text-red-600 text-center mb-4 font-semibold">{validationMessage}</p>}
             {errorMessage && <p className="text-red-600 text-center mb-4">**Erro:** {errorMessage}</p>}
-            
+
             {submitStatus === "success" && <p className="text-green-600 font-semibold text-center">Formulário enviado com sucesso! A página será atualizada em breve...</p>}
             {submitStatus === "loading" && <p className="text-blue-600 font-semibold text-center">Enviando...</p>}
-            
+
             {submitStatus !== "loading" && submitStatus !== "success" && (
               <button type="submit" className="w-full py-3 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-300">
                 Enviar Respostas
