@@ -44,10 +44,10 @@ export async function POST(req: Request) {
         impacto_tecnologia_comunidade,
         avaliacao_formacao_tecnologia,
         experiencia_antes_depois,
-        email -- Removido 'data_envio' daqui pois ela tem um valor padrão no DB
+        email
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, $15 -- Apenas 15 placeholders, correspondendo aos 15 valores
+        $11, $12, $13, $14, $15
       );
     `;
 
@@ -75,18 +75,24 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Erro ao inserir dados:', error);
 
-    // Helper para obter a mensagem de erro de forma segura (corrige ESLint no-explicit-any)
+    // Helper para obter a mensagem de erro de forma segura
     let errorMessage = 'Erro desconhecido';
-    if (error instanceof Error) { // Verifica se é uma instância de Error
+    if (error instanceof Error) {
         errorMessage = error.message;
     } else if (typeof error === 'object' && error !== null && 'message' in error) {
-        errorMessage = (error as { message: string }).message; // Se for um objeto com 'message'
+        errorMessage = (error as { message: string }).message;
     } else if (typeof error === 'string') {
-        errorMessage = error; // Se for uma string
+        errorMessage = error;
     }
 
-    // Verificação para o código de erro de chave duplicada do PostgreSQL
-    if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') {
+    // AJUSTE FINAL AQUI: Verificamos e extraímos o código sem usar 'as any'
+    let errorCode: string | undefined;
+    if (error && typeof error === 'object' && 'code' in error) {
+        errorCode = (error as { code?: string }).code; // Acessa 'code' de forma segura
+    }
+
+    // Usamos 'errorCode' na condição
+    if (errorCode === '23505') { // Código de erro de chave duplicada do PostgreSQL
         return NextResponse.json(
             { message: 'Erro: Este e-mail já foi utilizado para enviar uma resposta. Por favor, utilize outro e-mail.', error: errorMessage },
             { status: 409 }
