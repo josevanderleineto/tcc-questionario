@@ -35,7 +35,7 @@ const Home: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // --- Opções dos Campos (mantidas) ---
-  const universidadeOptions = ["Universidade Federal do Recôncavo da Bahia", "Universidade Federal da Bahia"];
+  const universidadeOptions = ["UFBA - Universidade Federal da Bahia","UFRB - Universidade Federal do Recôncavo da Bahia","UFOB	- Universidade Federal do Oeste da Bahia", "UFSB	- Universidade Federal do Sul da Bahia", "UNIVASF Universidade Federal do Vale do São Francisco","UNILAB	Universidade da Integração Internacional da Lusofonia Afro-Brasileira", "UNEB Universidade do Estado da Bahia", "IFBA Instituto Federal da Bahia", "IFBAIANO Instituto Federal Baiano", "UEFS	Universidade Estadual de Feira de Santana", "UESC	Universidade Estadual de Santa Cruz","UESB – Universidade Estadual do Sudoeste da Bahia"];
   const cursosOptions = [
     "História", "Filosofia", "Direito", "Economia", "Biblioteconomia", "Medicina",
     "Enfermagem", "Engenharia Civil", "Engenharia Ambiental", "Computação",
