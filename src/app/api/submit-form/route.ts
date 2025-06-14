@@ -44,10 +44,10 @@ export async function POST(req: Request) {
         impacto_tecnologia_comunidade,
         avaliacao_formacao_tecnologia,
         experiencia_antes_depois,
-        email -- AQUI! REMOVEMOS 'data_envio' da lista de colunas
+        email
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, $15 -- AQUI! Agora são 15 placeholders, correspondendo aos 15 valores na lista 'values'
+        $11, $12, $13, $14, $15
       );
     `;
 
@@ -74,14 +74,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'Dados inseridos com sucesso!' }, { status: 200 });
   } catch (error) {
     console.error('Erro ao inserir dados:', error);
-    if ((error as any).code === '23505') { // PostgreSQL code for unique_violation
+
+    // SOLUÇÃO: Verificação de tipo mais segura para o erro
+    if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') {
         return NextResponse.json(
             { message: 'Erro: Este e-mail já foi utilizado para enviar uma resposta. Por favor, utilize outro e-mail.', error: (error as Error).message },
             { status: 409 }
         );
     }
+    // Trata outros erros
     return NextResponse.json(
-      { message: 'Erro ao inserir dados', error: (error as Error).message, dbError: error },
+      { message: 'Erro ao inserir dados', error: (error as Error).message || 'Erro desconhecido', dbError: error },
       { status: 500 }
     );
   }
