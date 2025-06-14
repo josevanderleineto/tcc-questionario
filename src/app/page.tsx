@@ -211,7 +211,7 @@ const Home: React.FC = () => {
 
           {/* Campo de Email - Agora obrigatório */}
           <div className="mt-8 pt-6 border-t border-blue-200">
-             <h2 className="text-2xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 mb-4">E-mail</h2>
+             <h2 className="text-2xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 mb-4">CONTATO</h2>
              <TextInput
                label="15. Por favor, digite seu e-mail para contato." // Label indicando que é obrigatório
                value={email}

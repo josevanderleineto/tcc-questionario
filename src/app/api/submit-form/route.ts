@@ -44,10 +44,10 @@ export async function POST(req: Request) {
         impacto_tecnologia_comunidade,
         avaliacao_formacao_tecnologia,
         experiencia_antes_depois,
-        email
+        email -- Removido 'data_envio' daqui pois ela tem um valor padrão no DB
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, $15
+        $11, $12, $13, $14, $15 -- Apenas 15 placeholders, correspondendo aos 15 valores
       );
     `;
 
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Erro ao inserir dados:', error);
 
-    // Helper para obter a mensagem de erro de forma segura
+    // Helper para obter a mensagem de erro de forma segura (corrige ESLint no-explicit-any)
     let errorMessage = 'Erro desconhecido';
     if (error instanceof Error) { // Verifica se é uma instância de Error
         errorMessage = error.message;
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
         errorMessage = error; // Se for uma string
     }
 
-    // A primeira verificação para o código de erro do PostgreSQL já está boa
+    // Verificação para o código de erro de chave duplicada do PostgreSQL
     if (error && typeof error === 'object' && 'code' in error && (error as any).code === '23505') {
         return NextResponse.json(
             { message: 'Erro: Este e-mail já foi utilizado para enviar uma resposta. Por favor, utilize outro e-mail.', error: errorMessage },
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
         );
     }
     
-    // Agora usando 'errorMessage' que foi tratado
+    // Retorna a mensagem de erro geral
     return NextResponse.json(
       { message: 'Erro ao inserir dados', error: errorMessage, dbError: error },
       { status: 500 }
